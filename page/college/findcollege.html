@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>院系查询</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+        <!--院系代号选择-->
+                        <div class="layui-inline">
+                            <label class="layui-form-label">院系代号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="collegeage" class="layui-input" placeholder="请输入院系代号">
+                            </div>
+                        </div>
+        <!--院系选择-->
+                        <div class="layui-inline" >
+                            <label class="layui-form-label" >院系名称</label>
+                            <div class="layui-input-inline" >
+                                <select name="college" lay-filter="college" lay-verify="required">
+                                    <option value="" ></option>
+                                    <option value="计算机科技与技术">计算机科技与技术</option>
+                                    <option value="自动化">自动化</option>
+                                </select>
+                            </div>
+                        </div>
+        <!--搜索，重置按钮-->
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <!--添加院系，批量删除-->
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加院系 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 批量删除 </button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+        <!--自增的自定义模板-->
+        <script type="text/html" id="increment">
+            {{d.LAY_TABLE_INDEX+1}}
+        </script>
+        <!--显示用户的自定义模板-->
+        <script type="text/html" id="statusTablBar">
+            <input  type="checkbox" name="close" lay-skin="switch" lay-filter="switchTest" lay-text="启用|禁用" lay-event="open" {{d.close == '1' ? 'checked' : '' }}>
+        </script>
+        <!--修改院系，查询院系 按钮-->
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">修改院系</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除院系</a>
+        </script>
+    </div>
+</div>
+<script src="../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table','laydate'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            laydate = layui.laydate;
+//年选择器
+        laydate.render({
+            elem: '#year'
+            ,type: 'year',
+            trigger:'click',
+        });
+        //显示框
+        table.render({
+            elem: '#currentTableId',
+            url: '../../api/collegefind.json',                    //参数来源
+            toolbar: '#toolbarDemo',                        //显示位置
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [[
+                {type: "checkbox", width: 50},
+                {field: 'increment', width: 80, title: '序号', sort: true,templet:"#increment", align: "center"},
+                {field: 'collegeage', width: 100, title: '院系代号', sort: true, align: "center"},
+                {field: 'college', width: 150, title: '院系名称', align: "center"},
+                {field: 'remark',  Width: 170, title: '备注',align: "center"},
+                {title: '操作', minWidth: 120, toolbar: '#currentTableBar', align: "center"}
+            ]],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 10,
+            page: true,
+            skin: 'line'
+        });
+//toolbar监听事件
+        //监听  添加院系，批量删除院系  操作
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加院系',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['50%', '80%'],
+                    content: 'add/addcollege.html',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+        });
+        //监听  修改院系，删除院系   操作
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+//修改
+                var index = layer.open({
+                    title: '修改院系',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['50%', '80%'],
+                    content: './revise/revisecollege.html',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+//删除
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                });
+            }
+        });
+// 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            layer.alert(result, {
+                title: '最终的搜索信息'
+            });
+
+//执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    searchParams: result
+                }
+            }, 'data');
+
+            return false;
+        });
+
+    });
+</script>
+
+</body>
+</html>

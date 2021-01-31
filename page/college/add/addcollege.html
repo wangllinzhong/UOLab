@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>院系添加</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form" action="">
+            <!--院系代号-->
+            <div class="layui-form-item">
+                <label class="layui-form-label" >*院系代号</label>
+                <div class="layui-input-block">
+                    <input id="collegeId" type="text" name="collegeId" lay-verify="required"  placeholder="请输入院系代号" class="layui-input" onblur="checkcollegeId()">
+                </div>
+            </div>
+            <!--院系名称-->
+            <div class="layui-form-item">
+                <label class="layui-form-label" >*院系名称</label>
+                <div class="layui-input-block">
+                    <input id="collegeName" type="text" name="collegeName" lay-verify="required"  placeholder="请输入院系名称" class="layui-input" onblur="checkcollegeName()">
+                </div>
+            </div>
+            <!--备注-->
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" class="layui-textarea" name="desc"></textarea>
+                </div>
+            </div>
+            <!--添加院系-->
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="demo1">添加院系</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script type="text/javascript" >
+    /*院系代号验证*/
+    function checkcollegeId() {
+        var collegeId = document.getElementById("collegeId").value;
+        var pattern = /^[a-zA-Z0-9]{1,10}$/;
+        if(collegeId == null || collegeId == '' || collegeId.trim().length == 0){
+            layer.msg('院系代号不能为空',{
+                icon:5,
+                time:1000
+            });
+        }else if(!pattern.test(collegeId)) {
+            layer.msg('院系代号格式不正确',{
+                icon:5,
+                time:1000
+            });
+        }
+    }
+    /*院系名称验证*/
+    function checkcollegeName() {
+        var collegeName = document.getElementById("collegeName").value;
+        var pattern = /^[\u4e00-\u9fa5]{2,15}$/;
+        if(collegeName == null || collegeName == '' || collegeName.trim().length == 0){
+            layer.msg('院系名称不能为空',{
+                icon:5,
+                time:1000
+            });
+        }else if(!pattern.test(collegeName)) {
+            layer.msg('院系名称格式不正确',{
+                icon:5,
+                time:1000
+            });
+        }
+    }
+</script>
+<script>
+    layui.use(['form', 'layedit'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            var index = layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            }, function () {
+
+                // 关闭弹出层
+                layer.close(index);
+
+                var iframeIndex = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(iframeIndex);
+            });
+            return false;
+        });
+    });
+</script>
+
+</body>
+</html>
