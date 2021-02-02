@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>专业添加</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../../lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <form class="layui-form layuimini-form" action="">
+            <!--院系选择-->
+            <div class="layui-form-item">
+                <label class="layui-form-label" >院系</label>
+                <div class="layui-input-block " >
+                    <select name="interest" lay-filter="aihao">
+                        <option value="0" disabled></option>
+                        <option value="计算机科学与技术" selected> 计算机科学与技术</option>
+                        <option value="物联网工程">物联网工程</option>
+                        <option value="软件工程">软件工程</option>
+                    </select>
+                </div>
+            </div>
+            <!--专业名称-->
+            <div class="layui-form-item">
+                <label class="layui-form-label required" >专业名称</label>
+                <div class="layui-input-block">
+                    <input id="collegeName" type="text" name="collegeName" lay-verify="required"  placeholder="请输入院系名称" class="layui-input">
+                    <tip>2-15个汉字</tip>
+                </div>
+            </div>
+            <!--备注-->
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">备注：</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" class="layui-textarea" name="desc"></textarea>
+                </div>
+            </div>
+            <!--添加专业-->
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="demo1">添加专业</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../../../lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'layedit','jquery'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            ,$ = layui.jquery;
+        //院系名称
+        $("#collegeName").blur(function(){
+            var collegeName = $("#collegeName").val();
+            var pattern = /^[\u4e00-\u9fa5]{2,15}$/;
+            if(collegeName == null || collegeName == '' || collegeName.trim().length == 0){
+                layer.msg('院系名称不能为空',{
+                    icon:5,
+                    time:1000
+                });
+            }else if(!pattern.test(collegeName)) {
+                layer.msg('院系名称格式不正确',{
+                    icon:5,
+                    time:1000
+                });
+
+            }
+        });
+        // 进行确认操作
+        form.on('submit(demo1)', function (data) {
+            var data = data.field;
+            var collegeName = data.collegeName;
+            var pattern1 = /^[\u4e00-\u9fa5]{2,15}$/;
+            if(collegeName == null || collegeName == '' || collegeName.trim().length == 0){
+                layer.msg('院系名称不能为空',{
+                    icon:5,
+                    time:1000
+                });
+                return false;
+            }else if(!pattern1.test(collegeName)) {
+                layer.msg('院系名称格式不正确',{
+                    icon:5,
+                    time:1000
+                });
+                return false;
+            }
+            /*提交信息*/
+            var index = layer.alert(JSON.stringify(data), {
+                title: '最终的提交信息'
+            }, function () {
+                layer.close(index);
+                var iframeIndex = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(iframeIndex);
+            });
+            return false;
+        });
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+    });
+</script>
+
+</body>
+</html>
